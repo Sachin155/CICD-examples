@@ -46,7 +46,11 @@ jobs:
           append: true
           message: |
             ```
+            ##################Start ##################
+
             ${{ env.RESULT_OUTPUT }}
+
+            ##################END####################
             ```   
   build:
     name: Build Docker Image
