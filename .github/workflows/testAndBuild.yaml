@@ -65,7 +65,7 @@ jobs:
           password: ${{ secrets.DOCKER_PASSWORD }}
 
       - name: Build Docker image
-        run: docker build -t your-dockerhub-user/sample-app:${{ github.sha }} .
+        run: docker build -t dundder/cicd-exmaples:${{ github.sha }} .
 
       - name: Push Docker image
-        run: docker push your-dockerhub-user/sample-app:${{ github.sha }}
+        run: docker push dundder/cicd-exmaples:${{ github.sha }}
