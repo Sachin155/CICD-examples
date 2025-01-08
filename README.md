@@ -5,27 +5,25 @@ This repository demonstrates how to set up a Python application with automated t
 ## Project Structure
 
 ```
-sample-python-app/
-├── app/
-│   ├── __init__.py       # Makes this a Python package
-│   ├── app.py            # Main application logic
-├── tests/
-│   ├── __init__.py       # Makes this a Python package
-│   ├── test_app.py       # Unit tests for the application
-├── .github/
-│   └── workflows/
-│       └── test-and-build.yml  # GitHub Actions workflow file
-├── Dockerfile            # Docker configuration for the app
-├── requirements.txt      # Dependencies for the application
-├── coverage.xml          # Coverage report (generated automatically)
-├── README.md             # Documentation for the project
-├── .gitignore            # Ignored files and folders
+├── app
+├── contact_app
+├── db.sqlite3
+├── Dockerfile
+├── k8s-ci-load-test-main
+│   ├── deployment-foo-bar.yaml
+│   ├── kindCluster.yaml
+│   ├── loadtest.js
+│   ├── nginxIngress.yaml
+│   └── README.md
+├── manage.py
+├── pytest.ini
+├── README.md
+└── requirements.txt
 ```
 
 ### **Folder Structure**
 
-- **`app/`**: Contains the main Python application logic (e.g., `app.py`).
-- **`tests/`**: Contains unit tests for the application (e.g., `test_app.py`).
+- **`app/`**: Contains the main Python application logic .
 - **`.github/workflows/`**: GitHub Actions workflow file that automates testing, coverage, and Docker image building.
 - **`Dockerfile`**: Defines the Docker image for the application.
 - **`requirements.txt`**: Lists Python dependencies such as `coverage` and `unittest2`.
@@ -45,27 +43,17 @@ To install the required Python dependencies, run:
 pip install -r requirements.txt
 ```
 
-This will install:
-- `unittest2` (for enhanced testing functionality)
-- `coverage` (for measuring code coverage)
 
 ### **2. Running the Tests Locally**
 
 You can run the tests locally using:
 
 ```bash
-python -m unittest discover
+pytest .
 ```
 
-This will discover and run all the test cases inside the `tests/` folder.
+This will discover and run all the test cases.
 
-To run tests with coverage:
-
-```bash
-coverage run -m unittest discover
-coverage report
-coverage html   # Generates an HTML report (optional)
-```
 
 ---
 
@@ -75,7 +63,6 @@ coverage html   # Generates an HTML report (optional)
 
 This repository uses GitHub Actions to automate the following tasks:
 - **Unit Test Execution**: Runs unit tests and generates a code coverage report.
-- **Coverage Reporting**: Uploads a coverage report as a comment on the pull request.
 - **Docker Image Building**: Builds and pushes a Docker image to Docker Hub when a pull request is merged into a protected branch.
 
 ### **2. Workflow Details**
@@ -85,8 +72,7 @@ The workflow is defined in `.github/workflows/test-and-build.yml` and runs on ev
 1. **Checkout Code**: Fetches the latest changes.
 2. **Setup Python**: Installs Python and dependencies.
 3. **Run Tests and Coverage**: Executes unit tests and generates a coverage report.
-4. **Upload Coverage Report**: Posts the code coverage report as a PR comment.
-5. **Build and Push Docker Image**: On a successful PR merge, builds the Docker image and pushes it to Docker Hub.
+4. **Build and Push Docker Image**: On a successful PR merge, builds the Docker image and pushes it to Docker Hub.
 
 ---
 
@@ -97,13 +83,23 @@ The workflow is defined in `.github/workflows/test-and-build.yml` and runs on ev
 The `Dockerfile` in the root directory specifies how to containerize the Python application. Here's a basic example:
 
 ```dockerfile
-FROM python:3.9-slim
+FROM ubuntu:18.04
+
+RUN apt-get update && \
+    apt-get -y upgrade && \
+    DEBIAN_FRONTEND=noninteractive apt-get install -yq libpq-dev gcc python3.8 python3-pip && \
+    apt-get clean
 
 WORKDIR /app
 
-COPY . .
+COPY . /app/
 
-CMD ["python", "-m", "unittest", "discover"]
+RUN pip3 install -r requirements.txt 
+
+
+EXPOSE 8000/tcp
+
+CMD ["/bin/sh", "-c", "python3 manage.py runserver"]ss
 ```
 
 This file builds an image with Python and runs the tests when the container starts.
@@ -112,18 +108,3 @@ This file builds an image with Python and runs the tests when the container star
 
 After merging a PR into a protected branch (e.g., `main`), the GitHub Actions workflow builds and pushes a Docker image to Docker Hub. The image is tagged with the commit SHA.
 
----
-
-## Contribution
-
-Feel free to fork this repository and open a pull request if you'd like to contribute. Ensure that all tests pass and the coverage is up to date before submitting.
-
----
-
-## License
-
-This project is licensed under the MIT License - see the [LICENSE](LICENSE) file for details.
-
----
-
-This README provides an overview of how your project is structured and how to use GitHub Actions for automation. Let me know if you need any additions or changes!
