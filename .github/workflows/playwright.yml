@@ -1,0 +1,64 @@
+name: Playwright Tests
+on:
+  push:
+    branches: [ main, dev, stg ]   # Trigger on Push to these branches (main, dev, stg)
+  pull_request:
+    branches: [ main, dev, stg ]   # Trigger on PRs to these branches (main, dev, stg)
+jobs:
+  test:
+    timeout-minutes: 60
+    runs-on: ubuntu-latest         # Set a timeout of 60 minutes for the job
+    steps:
+    - uses: actions/checkout@v4    # Step to check out the repository code
+
+    - uses: actions/setup-node@v4  # Step to set up Node.js environment
+      with:
+        node-version: lts/*        # Install the latest LTS version of Node.js
+
+    - name: Install dependencies
+      run: npm ci                  # Use `npm ci` for clean, reproducible installation
+
+    - name: Install Playwright Browsers
+      run: npx playwright install --with-deps            # Install Playwright browsers along with dependencies
+
+    - name: Run Playwright Smoke tests
+      run: npx playwright test --grep "@smoke"           # Run tests with the @smoke tag
+
+    - name: Run Playwright Acceptance tests
+      run: npx playwright test                           # Run all Playwright tests
+
+    - uses: actions/upload-artifact@v4
+      if: ${{ !cancelled() }}
+      with:
+        name: playwright-report
+        path: playwright-report/
+        retention-days: 30
+
+
+  build:
+    timeout-minutes: 60
+    runs-on: ubuntu-latest
+      
+    steps:
+    - uses: actions/checkout@v4
+      
+    - uses: actions/setup-node@v4
+      with:
+        node-version: lts/*
+      
+    - name: Install dependencies
+      run: npm ci
+      
+    - name: Log in to Docker Hub
+      uses: docker/login-action@v2
+      with:
+        username: ${{ secrets.DOCKER_USERNAME }}  # Use Docker Hub credentials stored as GitHub secrets
+        password: ${{ secrets.DOCKER_PASSWORD }}  # Docker Hub password stored as a GitHub secret
+
+    - name: Build Docker Image              # Build the Docker image for the application
+      run: |
+           docker build -t my-playwright-app:${{ github.sha }} .
+      
+    - name: Push Docker Image to Docker Hub  # Push the built Docker image to Docker Hub
+      run: |
+           docker push my-playwright-app:${{ github.sha }}
