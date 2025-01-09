@@ -1,17 +1,16 @@
-FROM ubuntu:18.04
-
-RUN apt-get update && \
-    apt-get -y upgrade && \
-    DEBIAN_FRONTEND=noninteractive apt-get install -yq libpq-dev gcc python3.8 python3-pip && \
-    apt-get clean
+FROM node
+FROM mcr.microsoft.com/playwright:focal
 
 WORKDIR /app
 
-COPY . /app/
+COPY package-lock.json /app
+COPY package.json /app
 
-RUN pip3 install -r requirements.txt 
+RUN npm ci
 
+RUN npx playwright install
 
-EXPOSE 8000/tcp
+COPY . .
 
-CMD ["/bin/sh", "-c", "python3 manage.py runserver"]
+CMD ["npm", "test"]
+

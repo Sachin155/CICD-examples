@@ -1,0 +1,38 @@
+Feature: Cart Functionality
+  As a user of the Sauce Labs Demo website
+  I want to test cart-related features
+  So that I can verify their behavior for different scenarios
+
+  @cart
+  Scenario: Add a product to the cart
+    Given the user has logged in with "standard_user" and "secret_sauce"
+    When the user clicks "Add to cart" for the "Sauce Labs Backpack"
+    Then the cart count should increase to 1
+    And the cart should display "Sauce Labs Backpack" as an item
+
+  Scenario: Remove a product from the cart
+    Given the user has added "Sauce Labs Backpack" to the cart
+    When the user clicks "Remove" next to the product in the cart
+    Then the cart should no longer display "Sauce Labs Backpack"
+    And the cart count should decrease to 0
+
+  Scenario: Validate product details in the cart
+    Given the user has added "Sauce Labs Backpack" and "Sauce Labs Bike Light" to the cart
+    When the user navigates to the cart page
+    Then the cart should display:
+      | Product Name           | Price    |
+      | Sauce Labs Backpack    | $29.99   |
+      | Sauce Labs Bike Light  | $9.99    |
+
+  Scenario: Successful Checkout
+    Given the user is logged in as "standard_user" with password "secret_sauce"
+    And the user has added "Sauce Labs Backpack" to the cart
+    When the user navigates to the cart page
+    And proceeds to checkout
+    And fills in the shipping details:
+      | First Name | AutoQA  |
+      | Last Name  | Test    |
+      | Postal Code| 12345   |
+    And clicks "Continue"
+    And clicks "Finish"
+    Then the user should see a confirmation message "Thank you for your order!"
