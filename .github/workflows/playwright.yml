@@ -59,8 +59,8 @@ jobs:
 
     - name: Build Docker Image              # Build the Docker image for the application
       run: |
-           docker build -t my-playwright-app:${{ github.sha }} .
+           docker build -t adiinasher/playwright-with-docker-by-adii:${{ github.sha }} .
       
     - name: Push Docker Image to Docker Hub  # Push the built Docker image to Docker Hub
       run: |
-           docker push my-playwright-app:${{ github.sha }}
+           docker push adiinasher/playwright-with-docker-by-adii:${{ github.sha }}
