@@ -19,6 +19,7 @@ jobs:
           filename: metrics.json
           token: ${{ secrets.GITHUB_TOKEN }}
           base: repositories
+          output_action: svg,json,png
           plugin_repositories: yes
           plugin_repositories_affiliations: owner, collaborator
           plugin_repositories_skipped: 0
