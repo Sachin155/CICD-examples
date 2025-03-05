@@ -1,0 +1,32 @@
+name: DORA Metrics Report
+on:
+#   schedule:
+#     - cron: "0 0 * * 1"  # Runs every Monday
+  workflow_dispatch:   # Allows manual execution
+
+jobs:
+  metrics:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Generate Repository Metrics
+        uses: lowlighter/metrics@latest
+        with:
+          filename: metrics.svg
+          token: ${{ secrets.GH_TOKEN }}
+          base: repositories
+          plugin_repositories: yes
+          plugin_repositories_affiliations: owner, collaborator
+          plugin_repositories_skipped: 0
+          plugin_activity: yes
+          plugin_activity_days: 30
+          plugin_activity_visibility: public
+          plugin_activity_filter: all
+          plugin_traffic: yes
+          plugin_traffic_days: 30
+          plugin_lines: yes
+          plugin_followup: yes
+          plugin_followup_sections: repositories
+          plugin_github_actions: yes
+          plugin_github_actions_days: 30
+          plugin_github_actions_visibility: public
+          plugin_github_actions_status: all
