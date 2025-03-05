@@ -16,7 +16,7 @@ jobs:
       - name: Generate Repository Metrics
         uses: lowlighter/metrics@latest
         with:
-          filename: metrics.json
+          filename: metrics-1.json
           token: ${{ secrets.GITHUB_TOKEN }}
           base: repositories
           output_action: svg,json,png
@@ -36,3 +36,21 @@ jobs:
           plugin_github_actions_days: 30
           plugin_github_actions_visibility: public
           plugin_github_actions_status: all
+
+      - name: Upload SVG as Artifact
+        uses: actions/upload-artifact@v4
+        with:
+          name: dora-metrics-svg
+          path: metrics-1.svg
+
+      - name: Upload JSON as Artifact
+        uses: actions/upload-artifact@v4
+        with:
+          name: dora-metrics-svg
+          path: metrics-1.json
+
+      - name: Upload PNG as Artifact
+        uses: actions/upload-artifact@v4
+        with:
+          name: dora-metrics-svg
+          path: metrics-1.png
