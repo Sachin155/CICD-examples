@@ -4,6 +4,11 @@ on:
 #     - cron: "0 0 * * 1"  # Runs every Monday
   workflow_dispatch:   # Allows manual execution
 
+permissions:
+  contents: write  # Allow writing to repo
+  actions: read    # Read workflow actions
+  deployments: write  # Allow deployment access
+
 jobs:
   metrics:
     runs-on: ubuntu-latest
@@ -12,7 +17,7 @@ jobs:
         uses: lowlighter/metrics@latest
         with:
           filename: metrics.svg
-          token: ${{ secrets.GH_TOKEN }}
+          token: ${{ secrets.GITHUB_TOKEN }}
           base: repositories
           plugin_repositories: yes
           plugin_repositories_affiliations: owner, collaborator
